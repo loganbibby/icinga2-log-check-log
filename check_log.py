@@ -8,12 +8,7 @@ import sys
 
 log_flags_template = {
 	"last_size": 0,
-}
-
-def write_log(msg, severity="info"):
-	print("{}: {}".format(severity, msg))
-	pass
-	
+}	
 
 def build_parser():
 	parser = argparse.ArgumentParser(description="Check log file and report back to Icinga2")
@@ -21,10 +16,16 @@ def build_parser():
 	parser.add_argument("--regex", dest="regex_pattern", action="store", help="Regular expression pattern")
 	parser.add_argument("--negate", dest="negate", action="store_true", help="Only critical when not found")
 	parser.add_argument("--flags-file", dest="flags_filename", action="store", help="Flags filename", default="check_log_flags.json")
+	parser.add_argument("--debug", dest="debug", action="store_true")
 	return parser.parse_args()
 
 def main():
 	args = build_parser()
+	
+	def write_log(msg, severity="info"):
+		if args.debug:
+			print("{}: {}".format(severity, msg))
+		pass
 	
 	# Read in flags
 	if not os.path.isfile(args.flags_filename):
