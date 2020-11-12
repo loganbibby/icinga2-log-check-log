@@ -44,12 +44,11 @@ def main():
 
 	if args.log_filename not in flags:
 		flags[args.log_filename] = copy.deepcopy(log_flags_template)
-		
-
+	
 	# Check log file size
 	if not os.path.isfile(args.log_filename):
-		# TODO: needs error handling
-		pass
+		print("Log file does not exist: {}".format(args.log_filename))
+		sys.exit(2)
 
 	log_size = os.path.getsize(args.log_filename)
 	buffer = log_size
@@ -83,23 +82,24 @@ def main():
 
 	with open(args.flags_filename, "w") as fh:
 		json.dump(flags, fh)
+	
+	def print_output(msg):
+		print("{} | lines_processed={} bytes_read={} last_file_size={}".format(
+			msg,
+			len(lines),
+			buffer,
+			args.log_filename["last_size"]
+		))
 
 	# Handle output
 	if match and not args.negate:
-		# There was a match, let's go critical
-		print("{} | 'pattern_found'=1;1;1;0;1".format(match.string))
+		print_output("Pattern detected: {}".format(match.string))
 		sys.exit(2)
 	elif not match and args.negate:
-		# There was not a match and there should be, let's go critcal
-		print("No match found | 'pattern_found'=0;0;0;0;1")
+		print_output("Pattern not detected")
 		sys.exit(2)
 	else:
-		# All is well
-		print("All's well | 'pattern_found'={};{};{};0;1".format(
-			"1" if args.negate else "0",
-			"0" if args.negate else "1",
-			"0" if args.negate else "1"
-		))
+		print_output("All's well")
 		sys.exit(0)
 		
 if __name__ == '__main__':
