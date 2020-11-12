@@ -88,7 +88,7 @@ def main():
 			msg,
 			len(lines),
 			buffer,
-			args.log_filename["last_size"]
+			flags[args.log_filename]["last_size"]
 		))
 
 	# Handle output
